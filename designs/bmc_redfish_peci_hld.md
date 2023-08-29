@@ -12,9 +12,10 @@ This section list all content links.
 ### Revision
 This section list all modified revisions.
 
-format:
+
 | Rev |   date	 |       Author      |                       Change Description                     |
-|:v1.0:|:202308:|:team:|:------------------------------------------------------------:|
+|:---:|:--------:|:-----------------:|:------------------------------------------------------------:|
+  V0.1|   202308 |     team        |            draft version                                     |
 
 ### Scope  
 
