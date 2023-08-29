@@ -14,7 +14,7 @@ This section list all modified revisions.
 
 format:
 | Rev |   date	 |       Author      |                       Change Description                     |
-|:v0.1:|:202308:|:--:|:none:|
+|:v1.0:|:202308:|:team:|:------------------------------------------------------------:|
 
 ### Scope  
 
@@ -69,6 +69,55 @@ This section covers the high level design of the feature/enhancement. This secti
 		
 	- use systemd to restart service.
 
+**BLOCK DIAGRAM**
+```
++------------------------------------------------------------------------------------+
+|                                 CLIENT                                             |
+|                             EVENT LISTENER                                         |
+|                                                                                    |
++-----------------------------------------------------------------^---------^--------+
+CONFIGURATION|         |SSE(GET)        NETWORK        PUSH STYLE |         |SSE
+SUBSCRIPTION |         |                                 EVENTS   |  POST   |
++------------------------------------------------------------------------------------+
+|            |         |                                          |         |        |
+|   +--------+---------+---+  +---------------------------------------------------+  |
+|   |     REDFISH          |  |           EVENT SERVICE MANAGER   |         |     |  |
+|   |     SCHEMA           |  |   +-------------------------------+---------+--+  |  |
+|   |    RESOURCES         |  |   |          EVENT SERVICE                     |  |  |
+|   |                      |  |   |            SENDER                          |  |  |
+|   |                      |  |   +------^----------------------------+--------+  |  |
+|   |  +-------------+     |  |          |                            |           |  |
+|   |  |EVENT SERVICE|     |  |   +------+--------+            +------+--------+  |  |
+|   |  +-------------+     |  |   | METRICSREPORT |            |  EVENT LOG    |  |  |
+|   |                      |  |   | FORMATTER     |            |  FORMATTER    |  |  |
+|   |                      |  |   +------^--------+            +------^--------+  |  |
+|   |     +-------------+  |  |          |                            |           |  |
+|   |   + |SUBSCRIPTIONS+--------------------+------------------------------+     |  |
+|   | + | +-------------+  |  |          |   |                        |     |     |  |
+|   | | +--------------+   |  |   +------+---+----+            +------+-----+--+  |  |
+|   | +--------------|     |  |   | METRCISREPORT |            |  EVENT LOG    |  |  |
+|   |                      |  |   | MONITOR/AGENT |            |  MONITOR      |  |  |
+|   |                      |  |   +---------------+            +---------------+  |  |
+|   +----+-----------------+  +---------------------------------------------------+  |
+|        |                              |                             |              |
++------------------------------------------------------------------------------------+
+         |                              |                             |
+         |                              |                             |INOTIFY
+         |                              |                             |
++--------+----------+         +---------+----------+        +-----------------------+
+|                   |         |                    |        |  +-----------------+  |
+|    REDFISH        |         |     TELEMETRY      |        |  |     REDFISH     |  |
+|  EVENT SERVICE    |         |      SERVICE       |        |  |    EVENT LOGS   |  |
+|    CONFIG         |         |                    |        |  +-----------------+  |
+| PERSISTENT STORE  |         |                    |        |         |RSYSLOG      |
+|                   |         |                    |        |  +-----------------+  |
+|                   |         |                    |        |  |     JOURNAL     |  |
+|                   |         |                    |        |  |  CONTROL LOGS   |  |
+|                   |         |                    |        |  +-----------------+  |
++-------------------+         +--------------------+        +-----------------------+
+
+```
+
 ### SAI API 
 
 NA
@@ -115,10 +164,19 @@ To verify the performance aspect, we can stress-test the Daemon’s DBus
 interfaces to make sure the interfaces do not cause a high overhead.
 
 #### Unit Test cases  
+NA
 
 #### System Test cases
+Testing can be accomplished via automated or manual testing to verify that:
+* Configuration not listed as valid results in appropriate behavior.
+* Application detects and logs faults for power supply faults including input
+faults, output faults, shorts, current share faults, communication failures,
+etc.
+* Power supply VPD data reported for present power supplies.
+* Power supply removal and insertion, on a system supporting concurrent
+maintenance, does not result in power loss to powered on system.
+* System operates through power supply faults and power line disturbances as
+appropriate.
 
-### Open/Action items - if any 
-
-	
-NOTE: All the sections and sub-sections given above are mandatory in the design document. Users can add additional sections/sub-sections if required.
+CI testing could be impacted if a system being used for testing is in an
+unsupported or faulted configuration.
